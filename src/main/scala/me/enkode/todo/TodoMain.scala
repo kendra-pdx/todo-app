@@ -2,11 +2,12 @@ package me.enkode.todo
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
-import akka.http.scaladsl.model.{StatusCodes, Uri}
+import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server._
 import akka.stream.ActorMaterializer
+import me.enkode.todo.server.backend.{TodoDB, TodoBackendRouter}
 import me.enkode.todo.server.common.{Logging, Router}
-import me.enkode.todo.server.ui.UiServerRoutes
+import me.enkode.todo.server.ui.UiServerRouter
 import org.slf4j.LoggerFactory
 
 class TodoMain extends Router with Directives with Logging {
@@ -32,8 +33,11 @@ class TodoMain extends Router with Directives with Logging {
       (config.getString("host"), config.getInt("port"))
     }
 
+    val todoDB = TodoDB()
+
     val routers: Seq[Router] = Seq(
-      UiServerRoutes(),
+      UiServerRouter(),
+      TodoBackendRouter(todoDB),
       this
     )
 

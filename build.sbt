@@ -2,8 +2,16 @@ lazy val gatherJavaScripts = taskKey[Unit]("get the output of building js")
 
 lazy val `data-model` = crossProject
   .settings()
-  .jvmSettings()
-  .jsSettings()
+  .jvmSettings(
+    libraryDependencies ++= Seq(
+      Boilerplate.Modules.μPickle
+    )
+  )
+  .jsSettings(
+    libraryDependencies ++= Seq(
+      "com.lihaoyi" %%% "upickle" % "0.3.4"
+    )
+  )
 
 lazy val `data-model-jvm` = `data-model`.jvm
 lazy val `data-model-js` = `data-model`.js
@@ -24,12 +32,13 @@ lazy val `server-common` = project
   .settings(
     libraryDependencies ++= Seq(
       Boilerplate.Modules.akka("http-experimental", Boilerplate.Modules.akkaStreamsVersion),
+      Boilerplate.Modules.μPickle,
       Boilerplate.Modules.slf4j_api
     )
   )
 
 lazy val `backend-server` = project
-  .dependsOn(`data-model-jvm`)
+  .dependsOn(`data-model-jvm`, `server-common`)
 
 lazy val `ui-server` = project
   .dependsOn(`server-common`)

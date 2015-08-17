@@ -8,4 +8,6 @@
     <root level="trace">
         <appender-ref ref="STDOUT" />
     </root>
+
+    <logger name="me.enkode.todo.TodoMain" level="INFO"/>
 </configuration>
