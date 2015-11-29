@@ -4,11 +4,13 @@ import akka.http.scaladsl.server.{Route, Directives}
 import me.enkode.todo.server.common.{μPickleMarshallingSupport, Router}
 import me.enkode.todo.model._
 
+import scala.util.Random
+
 trait TodoBackendRouter extends Router with Directives with μPickleMarshallingSupport {
   def todoDB: TodoDB
 
   val getTodos: Route = (get & path("todo" / JavaUUID)) { listId ⇒
-    complete(TodoList(listId, Nil))
+    complete(TodoList(listId, List(new TodoItem(Random.alphanumeric.take(16).mkString))))
   }
 
   val updateTodo: Route = (put & path("todo" / JavaUUID / JavaUUID)) { (listId, todoId) ⇒

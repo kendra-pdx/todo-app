@@ -10,17 +10,31 @@ object Boilerplate extends AutoPlugin {
     scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked", "-Xlint", "-Xfatal-warnings", "-Yinline-warnings"))
 
   object Modules {
-    val akkaStreamsVersion = "1.0"
-    def akka(name: String, version: String = "2.3.12") = "com.typesafe.akka" %% s"akka-$name" % version
+    object Versions {
+      val µPickle = "0.3.6"
+      val scalaJsReact = "0.10.2"
+      val scalaJsDom = "0.8.2"
 
-    def slf4j(name: String) = "org.slf4j" % s"slf4j-$name" % "1.7.10"
+      val react = "0.14.3"
+
+      val akkaStreams = "2.0-M1"
+      val akka = "2.4.1"
+
+      val slf4j = "1.7.10"
+      val logback = "1.1.2"
+      val scalaXml = "1.0.4"
+    }
+
+    def akka(name: String, version: String = Versions.akka) = "com.typesafe.akka" %% s"akka-$name" % version
+
+    def slf4j(name: String) = "org.slf4j" % s"slf4j-$name" % Versions.slf4j
 
     lazy val slf4j_api = slf4j("api")
-    lazy val logback = "ch.qos.logback" % "logback-classic" % "1.1.2"
+    lazy val logback = "ch.qos.logback" % "logback-classic" % Versions.logback
 
-    lazy val scala_xml = "org.scala-lang.modules" %% "scala-xml" % "1.0.4"
+    lazy val scala_xml = "org.scala-lang.modules" %% "scala-xml" % Versions.scalaXml
 
-    lazy val μPickle = "com.lihaoyi" %% "upickle" % "0.3.4"
+    lazy val μPickle = "com.lihaoyi" %% "upickle" % Versions.µPickle
 
     lazy val logging = slf4j_api :: logback :: Nil
   }

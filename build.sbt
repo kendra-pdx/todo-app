@@ -9,7 +9,7 @@ lazy val `data-model` = crossProject
   )
   .jsSettings(
     libraryDependencies ++= Seq(
-      "com.lihaoyi" %%% "upickle" % "0.3.4"
+      "com.lihaoyi" %%% "upickle" % Boilerplate.Modules.Versions.µPickle
     )
   )
 
@@ -21,17 +21,27 @@ lazy val `ui-client` = project
   .dependsOn(`data-model-js`)
   .settings(
     libraryDependencies ++= Seq(
-      "com.github.japgolly.scalajs-react" %%% "core" % "0.9.2"
+      "com.github.japgolly.scalajs-react" %%% "core" % Boilerplate.Modules.Versions.scalaJsReact,
+      "org.scala-js" %%% "scalajs-dom" % Boilerplate.Modules.Versions.scalaJsDom
     ),
     jsDependencies ++= Seq(
-      "org.webjars" % "react" % "0.12.2" / "react-with-addons.js" commonJSName "React"
+      "org.webjars.bower" % "react" % Boilerplate.Modules.Versions.react
+        /        "react-with-addons.js"
+        minified "react-with-addons.min.js"
+        commonJSName "React",
+
+      "org.webjars.bower" % "react" % Boilerplate.Modules.Versions.react
+        /         "react-dom.js"
+        minified  "react-dom.min.js"
+        dependsOn "react-with-addons.js"
+        commonJSName "ReactDOM"
     )
   )
 
 lazy val `server-common` = project
   .settings(
     libraryDependencies ++= Seq(
-      Boilerplate.Modules.akka("http-experimental", Boilerplate.Modules.akkaStreamsVersion),
+      Boilerplate.Modules.akka("http-experimental", Boilerplate.Modules.Versions.akkaStreams),
       Boilerplate.Modules.μPickle,
       Boilerplate.Modules.slf4j_api
     )
@@ -45,7 +55,7 @@ lazy val `ui-server` = project
   .aggregate(`server-common`)
   .settings(
     libraryDependencies ++= Seq(
-      Boilerplate.Modules.akka("http-experimental", Boilerplate.Modules.akkaStreamsVersion),
+      Boilerplate.Modules.akka("http-experimental", Boilerplate.Modules.Versions.akkaStreams),
       Boilerplate.Modules.slf4j_api
     ),
     gatherJavaScripts := {
@@ -66,12 +76,12 @@ lazy val `ui-server` = project
 
 lazy val `todo` = project.in(file("."))
   .dependsOn(`backend-server`, `ui-server`, `server-common`)
-  .aggregate(`backend-server`, `ui-server`, `server-common`)
+  .aggregate(`backend-server`, `ui-server`, `server-common`, `ui-client`)
   .settings(Revolver.settings)
   .settings(
     libraryDependencies ++= Boilerplate.Modules.logging,
     libraryDependencies ++= Seq(
       Boilerplate.Modules.akka("actor"),
-      Boilerplate.Modules.akka("http-experimental", Boilerplate.Modules.akkaStreamsVersion)
+      Boilerplate.Modules.akka("http-experimental", Boilerplate.Modules.Versions.akkaStreams)
     )
   )
