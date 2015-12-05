@@ -7,7 +7,8 @@ object Boilerplate extends AutoPlugin {
     scalaVersion := "2.11.7",
     organization := "enkode.me",
     addCompilerPlugin("org.psywerx.hairyfotr" %% "linter" % "0.1.12"),
-    scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked", "-Xlint", "-Xfatal-warnings", "-Yinline-warnings"))
+    scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked", "-Xlint", "-Xfatal-warnings", "-Yinline-warnings"),
+    resolvers += "Websudos releases" at "https://dl.bintray.com/websudos/oss-releases/")
 
   object Modules {
     object Versions {
@@ -17,25 +18,34 @@ object Boilerplate extends AutoPlugin {
 
       val react = "0.14.3"
 
-      val akkaStreams = "2.0-M1"
+      val akkaStreams = "2.0-M2"
       val akka = "2.4.1"
 
       val slf4j = "1.7.10"
       val logback = "1.1.2"
       val scalaXml = "1.0.4"
+
+      val phantom = "1.11.0"
     }
 
-    def akka(name: String, version: String = Versions.akka) = "com.typesafe.akka" %% s"akka-$name" % version
+    private val v = Versions
 
-    def slf4j(name: String) = "org.slf4j" % s"slf4j-$name" % Versions.slf4j
+    def akka(name: String, version: String = v.akka) = "com.typesafe.akka" %% s"akka-$name" % version
+
+    def slf4j(name: String) = "org.slf4j" % s"slf4j-$name" % v.slf4j
 
     lazy val slf4j_api = slf4j("api")
-    lazy val logback = "ch.qos.logback" % "logback-classic" % Versions.logback
+    lazy val logback = "ch.qos.logback" % "logback-classic" % v.logback
 
-    lazy val scala_xml = "org.scala-lang.modules" %% "scala-xml" % Versions.scalaXml
+    lazy val scala_xml = "org.scala-lang.modules" %% "scala-xml" % v.scalaXml
 
-    lazy val μPickle = "com.lihaoyi" %% "upickle" % Versions.µPickle
+    lazy val μPickle = "com.lihaoyi" %% "upickle" % v.µPickle
 
     lazy val logging = slf4j_api :: logback :: Nil
+
+    lazy val phantom = Seq(
+      "com.websudos" %% "phantom-dsl" % v.phantom,
+      "com.websudos" %% "phantom-testkit" % v.phantom % Test
+    )
   }
 }

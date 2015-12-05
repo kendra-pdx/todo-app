@@ -4,6 +4,7 @@ import upickle._
 import upickle.default._
 
 trait μPickleMarshallingSupport {
+
   import akka.http.scaladsl.marshalling.{Marshaller, ToEntityMarshaller}
   import akka.http.scaladsl.model.ContentTypes
   import akka.http.scaladsl.model.MediaTypes.`application/json`

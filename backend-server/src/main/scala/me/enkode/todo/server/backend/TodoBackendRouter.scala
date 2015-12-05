@@ -1,30 +1,35 @@
 package me.enkode.todo.server.backend
 
-import akka.http.scaladsl.server.{Route, Directives}
-import me.enkode.todo.server.common.{μPickleMarshallingSupport, Router}
+import akka.http.scaladsl.server.{Directives, Route}
+import akka.stream.Materializer
 import me.enkode.todo.model._
+import me.enkode.todo.server.common.{Logging, Router, μPickleMarshallingSupport}
+import org.slf4j.LoggerFactory
 
-import scala.util.Random
+import scala.concurrent.ExecutionContext
 
-trait TodoBackendRouter extends Router with Directives with μPickleMarshallingSupport {
+trait TodoBackendRouter extends Router with Directives with μPickleMarshallingSupport with Logging {
   def todoDB: TodoDB
+  implicit def executionContext: ExecutionContext
+  implicit def materializer: Materializer
+
+  override def logger = LoggerFactory.getLogger(classOf[TodoBackendRouter])
 
   val getTodos: Route = (get & path("todo" / JavaUUID)) { listId ⇒
-    complete(TodoList(listId, List(new TodoItem(Random.alphanumeric.take(16).mkString))))
+    rejectEmptyResponse {
+      complete(todoDB.getTodoList(listId))
+    }
   }
 
-  val updateTodo: Route = (put & path("todo" / JavaUUID / JavaUUID)) { (listId, todoId) ⇒
-    complete(TodoList(listId, Nil))
+  val addTodo: Route = (post & path("todo" / JavaUUID) & entity(as[TodoItem])) { (listId, todoItem) ⇒
+    info(s"adding a todo item: $todoItem", ("todoListId" → listId) :: Nil)
+    complete(todoDB.addTodoItem(listId, todoItem))
   }
 
-  val addTodo: Route = (post & path("todo" / JavaUUID)) { listId ⇒
-    complete(TodoList(listId, Nil))
-  }
-
-  override def routes = Seq(getTodos, updateTodo)
+  override def routes = Seq(getTodos, addTodo)
 }
 
 object TodoBackendRouter {
-  class TodoBackendRouterImpl(val todoDB: TodoDB) extends TodoBackendRouter
-  def apply(todoDB: TodoDB): TodoBackendRouter = new TodoBackendRouterImpl(todoDB)
+  class TodoBackendRouterImpl(val todoDB: TodoDB)(implicit val executionContext: ExecutionContext, val materializer: Materializer) extends TodoBackendRouter
+  def apply(todoDB: TodoDB)(implicit executionContext: ExecutionContext, materializer: Materializer): TodoBackendRouter = new TodoBackendRouterImpl(todoDB)
 }

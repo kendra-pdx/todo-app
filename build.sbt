@@ -49,6 +49,9 @@ lazy val `server-common` = project
 
 lazy val `backend-server` = project
   .dependsOn(`data-model-jvm`, `server-common`)
+  .settings(
+    libraryDependencies ++= Boilerplate.Modules.phantom
+  )
 
 lazy val `ui-server` = project
   .dependsOn(`server-common`)

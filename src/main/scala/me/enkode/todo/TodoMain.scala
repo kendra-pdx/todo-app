@@ -5,7 +5,7 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server._
 import akka.stream.ActorMaterializer
-import me.enkode.todo.server.backend.{TodoDB, TodoBackendRouter}
+import me.enkode.todo.server.backend.{TodoListTable, CassandraTodoDB, TodoDB, TodoBackendRouter}
 import me.enkode.todo.server.common.{Logging, Router}
 import me.enkode.todo.server.ui.UiServerRouter
 import org.slf4j.LoggerFactory
@@ -33,7 +33,20 @@ class TodoMain extends Router with Directives with Logging {
       (config.getString("host"), config.getInt("port"))
     }
 
-    val todoDB = TodoDB()
+    val todoDB = {
+      import com.websudos.phantom.connectors.ContactPoint
+      import com.websudos.phantom.dsl.{context ⇒ _, _}
+
+      val dbConfig = actorSystem.settings.config.getConfig("todo.db")
+
+      implicit val keySpace = KeySpace(dbConfig.getString("keySpaceName"))
+      val contactPoint = ContactPoint.local.keySpace(keySpace.name)
+
+      object TodoListTable extends TodoListTable(dbConfig.getString("todoListTableName")) with contactPoint.Connector
+      new CassandraTodoDB(TodoListTable) {
+        init()
+      }
+    }
 
     val routers: Seq[Router] = Seq(
       UiServerRouter(),

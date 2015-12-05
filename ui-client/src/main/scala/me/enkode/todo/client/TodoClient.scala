@@ -1,5 +1,7 @@
 package me.enkode.todo.client
 
+import java.util.UUID
+
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
 import me.enkode.todo.model.{TodoItem, TodoList}
@@ -7,6 +9,7 @@ import org.scalajs.dom._
 import org.scalajs.dom.ext.Ajax
 
 import scala.scalajs.js.annotation.JSExport
+import upickle.default._
 
 
 @JSExport("TodoClient")
@@ -25,7 +28,9 @@ class TodoClient(mountNode: Node) {
     def handleSubmit(e: ReactEventI) = {
       e.preventDefault()
       $ modState { s ⇒
-        val todoList = s.todoList.withItem(new TodoItem(s.text))
+        val item = new TodoItem(s.text)
+        Ajax.post(s"/todo/${s.todoList.id}", write(item), headers = Map("Content-Type" → "application/json"))
+        val todoList = s.todoList.withItem(item)
         State(todoList, s.text)
       }
     }
@@ -39,17 +44,15 @@ class TodoClient(mountNode: Node) {
           <.button("Add #", state.todoList.items.size + 1)
         )
       )
-
     }
   }
 
   val TodoApp = ReactComponentB[Unit]("TodoApp")
-    .initialState(State(new TodoList, ""))
+    .initialState(State(TodoList(id = UUID.fromString("9190815b-7966-4c18-903a-26d197fc5df4")), ""))
     .renderBackend[Backend]
     .componentDidMount(scope => Callback {
       import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
       Ajax.get(s"/todo/${scope.state.todoList.id}") map { xhr =>
-        import upickle.default._
         read[TodoList](xhr.responseText)
       } foreach { todoList =>
         scope.modState(_.copy(todoList = todoList)).runNow()

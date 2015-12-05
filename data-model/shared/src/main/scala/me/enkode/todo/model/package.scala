@@ -1,5 +1,6 @@
 package me.enkode.todo
 
+import java.time.Instant
 import java.util.UUID
 
 import upickle._
@@ -13,4 +14,12 @@ package object model {
   implicit val uuidWriter = Writer[UUID] {
     case uuid: UUID ⇒ Js.Str(uuid.toString)
   }
+
+//  implicit val instantReader = Reader[Instant] {
+//    case Js.Str(i) ⇒ Instant.parse(i)
+//  }
+//
+//  implicit val instantWriter = Writer[Instant] {
+//    case instant: Instant ⇒ Js.Str(instant.toString)
+//  }
 }
