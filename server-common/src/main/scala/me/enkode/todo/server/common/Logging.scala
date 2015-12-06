@@ -1,11 +1,28 @@
 package me.enkode.todo.server.common
 
-import org.slf4j.Logger
+import me.enkode.logging.LoggingOps
+import org.slf4j.{MDC, Logger}
 
-trait Logging {
+trait Logging extends LoggingOps { self ⇒
   def logger: Logger
-  
-  type KeyValues = Seq[(String, Any)]
+
+  implicit val loggingOps = self
+
+  override def withMdc[R](mdc: KeyValues)(eval: ⇒ R) = {
+    val original = MDC.getCopyOfContextMap
+    mdc.foreach { case (k, v) ⇒
+      if (k != null && v != null){
+        MDC.put(k, v.toString)
+      }
+    }
+    val result = eval
+    if (original != null) {
+      MDC.setContextMap(original)
+    } else {
+      MDC.setContextMap(java.util.Collections.emptyMap())
+    }
+    result
+  }
 
   protected def stringify(kvs: KeyValues): String = {
     def quote(s: String): String = {
@@ -20,7 +37,7 @@ trait Logging {
     (kvs map { case (k, v) ⇒ s"$k=${quote(v.toString)}"}).mkString(", ")
   }
 
-  def debug(message: ⇒ String, kvs: ⇒ KeyValues = Nil): Unit = {
+  override def debug(message: ⇒ String, kvs: ⇒ KeyValues = Nil): Unit = {
     if (logger.isDebugEnabled) {
       if (kvs.isEmpty) {
         logger.debug(message)
@@ -30,7 +47,7 @@ trait Logging {
     }
   }
 
-  def info(message: ⇒ String, kvs: ⇒ KeyValues = Nil): Unit = {
+  override def info(message: ⇒ String, kvs: ⇒ KeyValues = Nil): Unit = {
     if (logger.isInfoEnabled) {
       if (kvs.isEmpty) {
         logger.info(message)
@@ -40,7 +57,7 @@ trait Logging {
     }
   }
 
-  def warn(message: ⇒ String, kvs: ⇒ KeyValues = Nil): Unit = {
+  override def warn(message: ⇒ String, kvs: ⇒ KeyValues = Nil): Unit = {
     if (logger.isWarnEnabled) {
       if (kvs.isEmpty) {
         logger.warn(message)
@@ -50,7 +67,7 @@ trait Logging {
     }
   }
 
-  def warn(message: ⇒ String, t: Throwable, kvs: ⇒ KeyValues): Unit = {
+  override def warn(message: ⇒ String, t: Throwable, kvs: ⇒ KeyValues): Unit = {
     if (logger.isInfoEnabled) {
       if (kvs.isEmpty) {
         logger.warn(message, t)
@@ -60,7 +77,7 @@ trait Logging {
     }
   }
 
-  def error(message: ⇒ String, kvs: ⇒ KeyValues = Nil): Unit = {
+  override def error(message: ⇒ String, kvs: ⇒ KeyValues = Nil): Unit = {
     if (logger.isWarnEnabled) {
       if (kvs.isEmpty) {
         logger.error(message)
@@ -70,7 +87,7 @@ trait Logging {
     }
   }
 
-  def error(message: ⇒ String, t: Throwable, kvs: ⇒ KeyValues): Unit = {
+  override def error(message: ⇒ String, t: Throwable, kvs: ⇒ KeyValues): Unit = {
     if (logger.isErrorEnabled) {
       if (kvs.isEmpty) {
         logger.error(message, t)

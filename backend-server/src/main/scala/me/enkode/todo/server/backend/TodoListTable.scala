@@ -12,8 +12,8 @@ abstract class TodoListTable(override val tableName: String) extends CassandraTa
   implicit def space: KeySpace
 
   object id extends UUIDColumn(this) with PartitionKey[UUID]
+  import upickle.default._
   object items extends JsonSetColumn[TodoListTable, TodoList, TodoItem](this) {
-    import upickle.default._
     override def fromJson(obj: String) = read[TodoItem](obj)
     override def toJson(obj: TodoItem) = write(obj)
   }

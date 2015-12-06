@@ -39,6 +39,7 @@ lazy val `ui-client` = project
   )
 
 lazy val `server-common` = project
+  .dependsOn(`data-model-jvm`)
   .settings(
     libraryDependencies ++= Seq(
       Boilerplate.Modules.akka("http-experimental", Boilerplate.Modules.Versions.akkaStreams),

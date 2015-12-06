@@ -1,9 +1,9 @@
 package me.enkode.todo.server.backend
 
-import akka.http.scaladsl.server.{Directives, Route}
+import akka.http.scaladsl.server.Route
 import akka.stream.Materializer
 import me.enkode.todo.model._
-import me.enkode.todo.server.common.{Logging, Router, μPickleMarshallingSupport}
+import me.enkode.todo.server.common.{Directives, Logging, Router, μPickleMarshallingSupport}
 import org.slf4j.LoggerFactory
 
 import scala.concurrent.ExecutionContext
@@ -13,17 +13,22 @@ trait TodoBackendRouter extends Router with Directives with μPickleMarshallingS
   implicit def executionContext: ExecutionContext
   implicit def materializer: Materializer
 
-  override def logger = LoggerFactory.getLogger(classOf[TodoBackendRouter])
+  override val logger = LoggerFactory.getLogger(classOf[TodoBackendRouter])
 
   val getTodos: Route = (get & path("todo" / JavaUUID)) { listId ⇒
-    rejectEmptyResponse {
-      complete(todoDB.getTodoList(listId))
+    trace("get todos") { implicit trace ⇒
+      trace.log.debug("getting todos")
+      rejectEmptyResponse {
+        tracedComplete(todoDB.getTodoList(listId))
+      }
     }
   }
 
   val addTodo: Route = (post & path("todo" / JavaUUID) & entity(as[TodoItem])) { (listId, todoItem) ⇒
-    info(s"adding a todo item: $todoItem", ("todoListId" → listId) :: Nil)
-    complete(todoDB.addTodoItem(listId, todoItem))
+    trace("add todo") { implicit trace ⇒
+      trace.log.info(s"adding a todo item: $todoItem", ("todoListId" → listId) :: Nil)
+      tracedComplete(todoDB.addTodoItem(listId, todoItem))
+    }
   }
 
   override def routes = Seq(getTodos, addTodo)
