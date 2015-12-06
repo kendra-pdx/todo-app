@@ -19,6 +19,6 @@ abstract class TodoListTable(override val tableName: String) extends CassandraTa
   }
 
   override def fromRow(row: Row) = {
-    TodoList(id(row), items(row).toList.sortBy(_.createdAt))
+    TodoList(id(row), items(row).toList.sortWith(_.createdAt >= _.createdAt))
   }
 }

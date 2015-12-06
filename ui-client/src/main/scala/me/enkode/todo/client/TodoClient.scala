@@ -7,9 +7,9 @@ import japgolly.scalajs.react.vdom.prefix_<^._
 import me.enkode.todo.model.{TodoItem, TodoList}
 import org.scalajs.dom._
 import org.scalajs.dom.ext.Ajax
+import upickle.default._
 
 import scala.scalajs.js.annotation.JSExport
-import upickle.default._
 
 
 @JSExport("TodoClient")
