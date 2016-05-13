@@ -42,7 +42,7 @@ lazy val `server-common` = project
   .dependsOn(`data-model-jvm`)
   .settings(
     libraryDependencies ++= Seq(
-      Boilerplate.Modules.akka("http-experimental", Boilerplate.Modules.Versions.akkaStreams),
+      Boilerplate.Modules.akka("http-experimental"),
       Boilerplate.Modules.μPickle,
       Boilerplate.Modules.slf4j_api
     )
@@ -59,7 +59,7 @@ lazy val `ui-server` = project
   .aggregate(`server-common`)
   .settings(
     libraryDependencies ++= Seq(
-      Boilerplate.Modules.akka("http-experimental", Boilerplate.Modules.Versions.akkaStreams),
+      Boilerplate.Modules.akka("http-experimental"),
       Boilerplate.Modules.slf4j_api
     ),
     gatherJavaScripts := {
@@ -86,6 +86,6 @@ lazy val `todo` = project.in(file("."))
     libraryDependencies ++= Boilerplate.Modules.logging,
     libraryDependencies ++= Seq(
       Boilerplate.Modules.akka("actor"),
-      Boilerplate.Modules.akka("http-experimental", Boilerplate.Modules.Versions.akkaStreams)
+      Boilerplate.Modules.akka("http-experimental")
     )
   )
