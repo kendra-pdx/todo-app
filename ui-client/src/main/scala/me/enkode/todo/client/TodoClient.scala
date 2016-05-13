@@ -23,8 +23,10 @@ class TodoClient(mountNode: Node) {
   case class State(todoList: TodoList, text: String)(implicit val trace: Trace)
 
   class Backend($: BackendScope[Unit, State]) {
-    def onChange(e: ReactEventI) =
-      $.modState(_.copy(text = e.target.value))
+    def onChange(e: ReactEventI) = {
+      val stateText = e.target.value
+      $.modState(_.copy(text = stateText))
+    }
 
     def handleSubmit(e: ReactEventI) = {
       e.preventDefault()
@@ -59,7 +61,7 @@ class TodoClient(mountNode: Node) {
         scope.modState(_.copy(todoList = todoList)).runNow()
       }
     })
-    .buildU
+    .build
 
   ReactDOM.render(TodoApp(), mountNode)
 }

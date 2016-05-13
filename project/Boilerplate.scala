@@ -13,10 +13,10 @@ object Boilerplate extends AutoPlugin {
   object Modules {
     object Versions {
       val µPickle = "0.4.0"
-      val scalaJsReact = "0.10.2"
-      val scalaJsDom = "0.8.2"
+      val scalaJsReact = "0.11.1"
+      val scalaJsDom = "0.9.0"
 
-      val react = "0.14.3"
+      val react = "15.0.2"
 
       val akka = "2.4.4"
 
